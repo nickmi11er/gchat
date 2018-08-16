@@ -1,0 +1,67 @@
+{{ define "chat" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sample of websocket with golang</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-responsive.min.css">
+    <script src="/assets/js/jquery-2.1.4.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/knockout-3.4.0.js">
+    </script>
+    <script src="/assets/js/jquery.json-2.5.1.min.js">
+    </script>
+</head>
+
+<body>
+
+<div class="card mb-3 border-info" style="max-width: 70rem;margin: 10rem auto;height: 30rem">
+    <div class="card-header">GChat</div>
+    <div class="card-body text-info">
+
+        {{/*<div class="messages">*/}}
+        {{/*</div>*/}}
+            <div class=" col-md-12">
+                <div class="messages" style="height: 20rem;overflow-y: scroll;display: block">
+                </div>
+            </div>
+
+        <div class="input-group mb-3">
+            <input id="message" type="text" class="form-control" placeholder="Message" aria-label="Send"
+                   aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="send()">Send</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<script>
+
+    let ws = new WebSocket("ws://localhost:8080/entry?session_token=9aef4bbffcdc5bee8d16502f8b29be55");
+
+    ws.onmessage = function (event) {
+        //alert(JSON.parse(str.data.toString())['body'])
+        let author = JSON.parse(event.data.toString())["author"]
+        let body = JSON.parse(event.data.toString())["body"]
+        $(".messages").append("<h5>"+author + ": " + body + "</h5>")
+        $(".messages").scrollTop($(".messages")[0].scrollHeight);
+    };
+
+    function send() {
+        ws.send(JSON.stringify({author: "test", body: $("#message").val()}))
+        $("#message").val("")
+    }
+
+</script>
+
+</body>
+</html>
+{{ end }}
+
+
